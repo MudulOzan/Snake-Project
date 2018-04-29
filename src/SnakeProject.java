@@ -53,12 +53,11 @@ public class SnakeProject extends JFrame implements KeyListener {
 		ActionListener taskPerformer = new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
             	move();
-            	dp.repaint();
             }
         };
         Timer timer = new Timer(150,taskPerformer);
         timer.setRepeats(true);
-        timer.start();
+        //timer.start();
         //endregion
         
         //region frameComponents
@@ -82,31 +81,29 @@ public class SnakeProject extends JFrame implements KeyListener {
 
 		switch(DIRECTION) {
     	case 0:
-			coords.set(0, new Point(coords.get(0).x + frame, 200));
-    		for(int i = 1; i < coords.size(); i++) {
-    			coords.set(i, new Point(coords.get(i).x + frame, coords.get(i).y));
-    		}
+    		head(coords.get(0), frame);
+			coords.set(0, new Point(coords.get(0).x + frame, coords.get(0).y));
     		break;
     	case 1:
-    		for(int i = 0; i < coords.size(); i++) {
-    			coords.set(i, new Point(coords.get(i).x - frame, coords.get(i).y));
-    		}
+    		head(coords.get(0), frame);
+			coords.set(0, new Point(coords.get(0).x - frame, coords.get(0).y));
     		break;
     	case 2:
-    		for(int i = 0; i < coords.size(); i++) {
-    			coords.set(i, new Point(coords.get(i).x, coords.get(i).y + frame));
-    		}
+    		head(coords.get(0), frame);
+			coords.set(0, new Point(coords.get(0).x, coords.get(0).y - frame));
     		break;
     	case 3:
-    		for(int i = 0; i < coords.size(); i++) {
-    			coords.set(i, new Point(coords.get(i).x, coords.get(i).y - frame));
-    		}
+    		head(coords.get(0), frame);
+			coords.set(0, new Point(coords.get(0).x, coords.get(0).y + frame));
     		break;
     	}
 	}
 	
-	public void head() {
-		
+	public void head(Point p, int frame) {
+		for(int i = 1; i < coords.size(); i++) {
+			coords.set(i, new Point(coords.get(i-1).x, coords.get(i-1).y));
+		}
+    	dp.repaint();
 	}
 	class DrawingPanel extends JPanel  {
 		@Override
@@ -124,10 +121,10 @@ public class SnakeProject extends JFrame implements KeyListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		int keyCode = e.getKeyCode();
-		if (keyCode == KeyEvent.VK_RIGHT) { DIRECTION = 0; }
-		else if (keyCode == KeyEvent.VK_LEFT) { DIRECTION = 1; }
-		else if (keyCode == KeyEvent.VK_UP) { DIRECTION = 2; }
-		else if (keyCode == KeyEvent.VK_DOWN) { DIRECTION = 3; }
+		if (keyCode == KeyEvent.VK_RIGHT) { DIRECTION = 0; move(); dp.repaint(); }
+		else if (keyCode == KeyEvent.VK_LEFT) { DIRECTION = 1; move(); dp.repaint(); }
+		else if (keyCode == KeyEvent.VK_UP) { DIRECTION = 2; move(); dp.repaint(); }
+		else if (keyCode == KeyEvent.VK_DOWN) { DIRECTION = 3; move(); dp.repaint(); }
 	}
 	@Override
 	public void keyReleased(KeyEvent arg0) {
@@ -142,6 +139,3 @@ public class SnakeProject extends JFrame implements KeyListener {
 	
 
 }
-
-
-
