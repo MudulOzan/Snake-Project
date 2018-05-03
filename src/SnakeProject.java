@@ -92,8 +92,10 @@ public class SnakeProject extends JFrame implements KeyListener {
 		int x = r.nextInt(maxX-minX)+minX;
 		int y = r.nextInt(maxY-minY)+minY;
 		Point p = new Point(x, y);
+		apple = 0;
 		return p;
 	}
+	//endregion
 	
 	public void move() {
 		final int frame = 10;
