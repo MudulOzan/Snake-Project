@@ -13,6 +13,7 @@ public class SnakeProject extends JFrame implements KeyListener {
 	private final int parts = 6;
 
 	private ArrayList<Point> coords = new ArrayList<Point>(); 
+
 	SnakeProject() {		
 		for (int i = 0; i < parts; i++) {
 			coords.add(new Point((300 - i * 10), 200));
@@ -103,6 +104,7 @@ public class SnakeProject extends JFrame implements KeyListener {
 		for(int i = 1; i < coords.size(); i++) {
 			coords.set(i, new Point(coords.get(i-1).x, coords.get(i-1).y));
 		}
+		coords.set(1, p);
     	dp.repaint();
 	}
 	class DrawingPanel extends JPanel  {
