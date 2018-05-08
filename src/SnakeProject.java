@@ -10,30 +10,69 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class SnakeProject extends JFrame implements KeyListener {
+	//region vars
+	private int score = 0;
+	private int SPEED = 200;
 	private DrawingPanel dp;
+	private JLabel lblScore;
 	private int DIRECTION = 0;
-	private final int parts = 6;
+	private int parts = 6;
 	private final Timer timer;
 	private ArrayList<Point> coords = new ArrayList<Point>(); 
-	private int apple = 0;
+	private int apple = 1;
 	private static SnakeProject w;
     private BufferedImage image;
+	private final int minY = 2;
+	private final int maxY = 40;
+	private final int minX = 4;
+	private final int maxX = 60;
+	private int aX = -100;
+	private int aY = -100;
+	private Point applePoint;
+	//endregion
 	SnakeProject() {		
-		for (int i = 0; i < parts; i++) {
-			coords.add(new Point((300 - i * 10), 200));
-		}
+		createSnake();
 		
 		addKeyListener(this);
 
+		JLabel exitIcon = new JLabel(); 
+		exitIcon.setIcon(new ImageIcon("C:\\Users\\Widmore\\hub\\Snake-Project\\bin\\download.png"));
+		exitIcon.setBounds(150, 150, 16, 16);
 		
+		JPanel contentPanel = new JPanel();
+		this.add(contentPanel);
 		
-
+		lblScore = new JLabel("Score");
+		lblScore.setBounds(150, 150, 50, 50);
+		lblScore.setForeground(Color.WHITE);
+		contentPanel.add(lblScore);
+		
 		//region JMenuBar
 		JMenuBar menubar = new JMenuBar();
 		
 		
 		JMenu menu = new JMenu("Menu");
 		menubar.add(menu);
+		
+		JMenuItem start = new JMenuItem("Start");
+		start.setToolTipText("Start");
+		start.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				score = 0;
+				parts = 6;
+				DIRECTION = 0;
+				createApplePos();
+				newGame();
+				timer.start();
+			}
+		});
+		menu.add(start);
+		
+		JMenuItem level = new JMenuItem("Level");
+		level.setToolTipText("Level");
+		
+		menu.add(level);
 		
 		
 		JMenu exit = new JMenu("Exit");
@@ -60,20 +99,20 @@ public class SnakeProject extends JFrame implements KeyListener {
             	move();
             }
         };
-        timer = new Timer(150,taskPerformer);
+        timer = new Timer(SPEED,taskPerformer);
         timer.setRepeats(true);
         timer.start();
         //endregion
-        apple = 1;
         
         //region frameComponents
-		dp = new DrawingPanel();
+        dp = new DrawingPanel();
 		this.add(dp);
 		
+		this.setUndecorated(true);
 		this.setBackground(Color.BLACK);
 		this.setResizable(false);
 		this.setTitle("Snake Game");
-		this.setSize(700,500);
+		this.setSize(750,500);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setVisible(true);
 		//endregion
@@ -82,18 +121,27 @@ public class SnakeProject extends JFrame implements KeyListener {
 		w = new SnakeProject();
 	}
 	
+	public void createSnake() {
+		for (int i = 0; i < parts; i++) {
+			coords.add(new Point((300 - i * 10), 200));
+		}
+	}
+	
+	public void newGame() {
+		for (int i = 0; i < parts; i++) {
+			coords.set(i, (new Point((300 - i * 10), 200)));
+		}
+	}
 	//region appleTime
-	public Point applePos() {
-		int minY = 20;
-		int maxY = 400;
-		int minX = 40;
-		int maxX = 600;
+	
+	public void createApplePos() {
 		Random r = new Random(); 
-		int x = r.nextInt(maxX-minX)+minX;
-		int y = r.nextInt(maxY-minY)+minY;
-		Point p = new Point(x, y);
-		apple = 0;
-		return p;
+		aX = (r.nextInt(maxX-minX)+minX) * 10;
+		aY = (r.nextInt(maxY-minY)+minY) * 10;
+	}
+	public Point applePos() {
+		applePoint = new Point(aX, aY);
+		return applePoint;
 	}
 	//endregion
 	
@@ -125,7 +173,17 @@ public class SnakeProject extends JFrame implements KeyListener {
     		bite();
     		break;
     	}
+		eat(coords.get(0));
 	}
+	
+	//region eat
+	public void eat(Point p) {
+		if(p.x == applePoint.x && p.y == applePoint.y) {
+			createApplePos();
+			score += 10;
+		}
+	}
+	//endregion
 	
 	//region where is my snake?
 	public void isLeft() {
@@ -159,7 +217,7 @@ public class SnakeProject extends JFrame implements KeyListener {
 		for (int i = 1; i < coords.size(); i++) {
 			if (coords.get(0).x == coords.get(i).x && coords.get(0).y == coords.get(i).y) { 
 				timer.stop(); 
-				JOptionPane.showMessageDialog(w, new JLabel("Game Over",JLabel.CENTER), "Game Over", JOptionPane.PLAIN_MESSAGE);
+				JOptionPane.showMessageDialog(w, new JLabel("Game Over. our score: " + score,JLabel.CENTER), "Game Over", JOptionPane.PLAIN_MESSAGE);
 			}
 		}
 	}
@@ -171,21 +229,25 @@ public class SnakeProject extends JFrame implements KeyListener {
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
 			g.drawRect(40, 20, 600, 400);
+			g.setColor(Color.WHITE);
+			g.drawString("Score: " + score, 650, 40);
 			for(int i = 0; i < 6; i++) {
 				g.setColor(new Color(0, 190, 0));
 				g.fillOval(coords.get(i).x, coords.get(i).y, 10, 10);
 				setBackground(Color.BLACK);
 			}
 			if (apple == 1) {
-				URL resource = getClass().getResource("apple.png");
-		        try {
-		            image = ImageIO.read(resource);
-		        } catch (IOException e) {
-		            e.printStackTrace();
-		        }
-				g.setColor(new Color(255, 0, 0));
-				g.drawImage(image, applePos().x, applePos().y, this);
+				createApplePos();
+				apple = 0;
 			}
+			URL resource = getClass().getResource("apple.png");
+	        try {
+	            image = ImageIO.read(resource);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+			g.setColor(new Color(255, 0, 0));
+			g.drawImage(image, applePos().x, applePos().y, this);
 		}
 	}
 
@@ -193,10 +255,10 @@ public class SnakeProject extends JFrame implements KeyListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		int keyCode = e.getKeyCode();
-		if (keyCode == KeyEvent.VK_RIGHT && DIRECTION != 1) { DIRECTION = 0; move(); dp.repaint(); }
-		else if (keyCode == KeyEvent.VK_LEFT && DIRECTION != 0) { DIRECTION = 1; move(); dp.repaint(); }
-		else if (keyCode == KeyEvent.VK_UP && DIRECTION != 3) { DIRECTION = 2; move(); dp.repaint(); }
-		else if (keyCode == KeyEvent.VK_DOWN && DIRECTION != 2) { DIRECTION = 3; move(); dp.repaint(); }
+		if (keyCode == KeyEvent.VK_RIGHT && DIRECTION != 1 && DIRECTION != 0) { DIRECTION = 0; }
+		else if (keyCode == KeyEvent.VK_LEFT && DIRECTION != 0 && DIRECTION != 1) { DIRECTION = 1; }
+		else if (keyCode == KeyEvent.VK_UP && DIRECTION != 3 && DIRECTION != 2) { DIRECTION = 2; }
+		else if (keyCode == KeyEvent.VK_DOWN && DIRECTION != 2 && DIRECTION != 3) { DIRECTION = 3; }
 	}
 	@Override
 	public void keyReleased(KeyEvent arg0) {}
