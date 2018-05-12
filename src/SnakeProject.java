@@ -9,15 +9,23 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+/*
+ * OOP & LAB Project
+ * Known bugs: 
+ * Quick key actions might end the game.
+ * Layout is still null.
+ * No exit button.
+ */
+
 public class SnakeProject extends JFrame implements KeyListener {
 	//region vars
 	private int score = 0;
-	private int SPEED = 200;
+	private int SPEED = 150;
 	private DrawingPanel dp;
 	private JLabel lblScore;
 	private int DIRECTION = 0;
 	private int parts = 6;
-	private final Timer timer;
+	private final Timer timer, eatTimer;
 	private ArrayList<Point> coords = new ArrayList<Point>(); 
 	private int apple = 1;
 	private static SnakeProject w;
@@ -28,6 +36,7 @@ public class SnakeProject extends JFrame implements KeyListener {
 	private final int maxX = 60;
 	private int aX = -100;
 	private int aY = -100;
+	private int THEME = 0;
 	private Point applePoint;
 	//endregion
 	SnakeProject() {		
@@ -99,9 +108,19 @@ public class SnakeProject extends JFrame implements KeyListener {
             	move();
             }
         };
+        ActionListener eatPerformer = new ActionListener() {
+        	public void actionPerformed(ActionEvent evt) {
+        		coords.add(new Point(coords.get(parts-1).x, coords.get(parts-1).y));
+        		parts++;
+        		SPEED--;
+        	}
+        };
+        
         timer = new Timer(SPEED,taskPerformer);
         timer.setRepeats(true);
-        timer.start();
+        
+        eatTimer = new Timer(SPEED*parts, eatPerformer);
+        eatTimer.setRepeats(false);
         //endregion
         
         //region frameComponents
@@ -116,6 +135,15 @@ public class SnakeProject extends JFrame implements KeyListener {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setVisible(true);
 		//endregion
+		
+		int reply = JOptionPane.showConfirmDialog(null, "Do you want light theme?", "Theme", JOptionPane.YES_NO_OPTION);
+        if (reply == JOptionPane.YES_OPTION) {
+        	THEME = 1;
+        	timer.start();
+        }
+        else {
+        	timer.start();
+        }
 	}
 	public static void main(String [] args) {
 		w = new SnakeProject();
@@ -181,6 +209,7 @@ public class SnakeProject extends JFrame implements KeyListener {
 		if(p.x == applePoint.x && p.y == applePoint.y) {
 			createApplePos();
 			score += 10;
+			eatTimer.start();
 		}
 	}
 	//endregion
@@ -217,7 +246,7 @@ public class SnakeProject extends JFrame implements KeyListener {
 		for (int i = 1; i < coords.size(); i++) {
 			if (coords.get(0).x == coords.get(i).x && coords.get(0).y == coords.get(i).y) { 
 				timer.stop(); 
-				JOptionPane.showMessageDialog(w, new JLabel("Game Over. our score: " + score,JLabel.CENTER), "Game Over", JOptionPane.PLAIN_MESSAGE);
+				JOptionPane.showMessageDialog(w, new JLabel("Game Over. your score: " + score,JLabel.CENTER), "Game Over", JOptionPane.PLAIN_MESSAGE);
 			}
 		}
 	}
@@ -231,10 +260,16 @@ public class SnakeProject extends JFrame implements KeyListener {
 			g.drawRect(40, 20, 600, 400);
 			g.setColor(Color.WHITE);
 			g.drawString("Score: " + score, 650, 40);
-			for(int i = 0; i < 6; i++) {
-				g.setColor(new Color(0, 190, 0));
-				g.fillOval(coords.get(i).x, coords.get(i).y, 10, 10);
-				setBackground(Color.BLACK);
+			for(int i = 0; i < coords.size(); i++) {
+				if(THEME == 0) {
+					g.setColor(new Color(0, 190, 0));
+					setBackground(Color.BLACK);
+				}
+				else {
+					g.setColor(new Color(0, 0, 0));
+					setBackground(Color.WHITE);
+				}
+				g.fillRect(coords.get(i).x, coords.get(i).y, 10, 10);
 			}
 			if (apple == 1) {
 				createApplePos();
