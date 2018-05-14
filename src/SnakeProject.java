@@ -127,7 +127,7 @@ public class SnakeProject extends JFrame implements KeyListener {
         dp = new DrawingPanel();
 		this.add(dp);
 		
-		this.setUndecorated(true);
+		//this.setUndecorated(true);
 		this.setBackground(Color.BLACK);
 		this.setResizable(false);
 		this.setTitle("Snake Game");
@@ -136,7 +136,7 @@ public class SnakeProject extends JFrame implements KeyListener {
 		this.setVisible(true);
 		//endregion
 		
-		int reply = JOptionPane.showConfirmDialog(null, "Do you want light theme?", "Theme", JOptionPane.YES_NO_OPTION);
+		int reply = JOptionPane.showConfirmDialog(w, "Do you want light theme?", "Theme", JOptionPane.YES_NO_OPTION);
         if (reply == JOptionPane.YES_OPTION) {
         	THEME = 1;
         	timer.start();
@@ -290,10 +290,10 @@ public class SnakeProject extends JFrame implements KeyListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		int keyCode = e.getKeyCode();
-		if (keyCode == KeyEvent.VK_RIGHT && DIRECTION != 1 && DIRECTION != 0) { DIRECTION = 0; }
-		else if (keyCode == KeyEvent.VK_LEFT && DIRECTION != 0 && DIRECTION != 1) { DIRECTION = 1; }
-		else if (keyCode == KeyEvent.VK_UP && DIRECTION != 3 && DIRECTION != 2) { DIRECTION = 2; }
-		else if (keyCode == KeyEvent.VK_DOWN && DIRECTION != 2 && DIRECTION != 3) { DIRECTION = 3; }
+		if (keyCode == KeyEvent.VK_RIGHT && DIRECTION != 1 && DIRECTION != 0) { DIRECTION = 0; move(); }
+		else if (keyCode == KeyEvent.VK_LEFT && DIRECTION != 0 && DIRECTION != 1) { DIRECTION = 1; move(); }
+		else if (keyCode == KeyEvent.VK_UP && DIRECTION != 3 && DIRECTION != 2) { DIRECTION = 2; move(); }
+		else if (keyCode == KeyEvent.VK_DOWN && DIRECTION != 2 && DIRECTION != 3) { DIRECTION = 3; move(); }
 	}
 	@Override
 	public void keyReleased(KeyEvent arg0) {}
